@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JSPass - Settings</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+        <script type="text/javascript" src="pbkdf2.js"></script>
+        <script type="text/javascript" src="options.js"></script>
+    </head>
+    <body>
+        <h1>JSPass - Options</h1>
+        <p id="info">
+            Changing any of this settings will also change your generated passwords!
+        </p>
+        <form id="f1" class="options">
+            <p>
+                <label for="salt">Salt:</label>
+                <span>Random text which will be appended to your master password</span>
+                <input type="text" name="salt" id="salt" value="">
+            </p>
+            <p>
+                <label for="passwordlength">Password length:</label>
+                <span>Length of the generated password</span>
+                <input type="text" name="passwordlength" id="passwordlength" value="15">
+            </p>
+            <p>
+                <label for="iterations">Iterations:</label>
+                <span>How many time the password will be randomized, higher value means slower processing</span>
+                <input type="text" name="iterations" id="iterations" value="">
+            </p>
+            <p>
+                <label for="mydomains">My domains:</label>
+                <span>Comma separated list with domains which will be used as third-level-domains (e.g. server1.mydomain.com instead of just mydomain.com)</span>
+                <input type="text" name="mydomains" id="mydomains" value="">
+            </p>
+            <p>
+                <label for="specialchars">Special Chars:</label>
+                <span>Used special chars</span>
+                <input type="text" name="specialchars" id="specialchars" value="!#$%&()*+,-./:;<=>?@[]^_`{|}~">
+            </p>
+            <p style="text-align: center">
+                <span id="status">&nbsp;</span>
+                <input type="submit" value="Save settings">
+            </p>
+        </form>
+    </body>
+</html>

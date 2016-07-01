@@ -1,0 +1,61 @@
+* {
+    font-family: Cantarell, Arial, sans-serif;
+    font-size: 14px;
+}
+
+h1 {
+    font-size: 2em;
+    letter-spacing: 0.1em;
+    text-align: center;
+    width: 600px;
+}
+
+input {
+    border: 1px solid #999;
+    padding: 2px;
+}
+input[type=text], input[type=password], input[type=submit] {
+    width: 200px;
+    -webkit-border-radius: 3px;
+}
+input[type=text], input[type=password] {
+    background-color: #eee;
+}
+input[type=submit] {
+    background-color: #ccc;
+    border-width: 2px;
+}
+#domainname {
+    background-color: transparent;
+}
+
+label {
+    float: left;
+    width: 150px;
+    font-weight: bold;
+}
+
+#info {
+    font-size: 1.4em;
+    letter-spacing: 0.1em;
+    border: 1px solid #999;
+    padding: 5px;
+    width: 596px;
+    -webkit-border-radius: 7px;
+}
+.options p {
+    width: 606px;
+}
+.options label {
+    float: none;
+    width: 600px;
+    display: block;
+    font-size: 1.1em;
+}
+.options input[type=text], .options input[type=submit] {
+    width: 600px;
+}
+.options span {
+    display: block;
+    font-style: italic;
+}
