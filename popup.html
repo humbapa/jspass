@@ -27,14 +27,27 @@
         font-size: 100%;
       }
 
-      label {
-        float: left;
-        width: 150px;
+      label,
+      summary {
         font-size: 13.3333px;
         color: var(--color-dark-gray);
       }
 
+      label {
+        float: left;
+        width: 150px;
+      }
+
       label strong {
+        color: var(--color-black);
+        font-weight: 400;
+      }
+
+      summary {
+        margin-left: 2px;
+      }
+
+      summary:hover {
         color: var(--color-black);
         font-weight: 400;
       }
@@ -54,30 +67,33 @@
           <label for="domainname"><strong>Domain name</strong></label>
           <input id="domainname" name="domainname" type="text" value="" required />
         </p>
-        <p>
-          <label for="passwordlength">Password length</label>
-          <input id="passwordlength" name="passwordlength" type="number" min="4" max="256" value="" autocomplete="off" />
-        </p>
-        <p>
-          <label for="usenumbers">Use numbers</label>
-          <input id="usenumbers" name="usenumbers" type="checkbox" value="1" checked="checked" />
-        </p>
-        <p>
-          <label for="minnumbers">Min. numbers</label>
-          <input id="minnumbers" name="minnumbers" type="number" min="1" value="2" autocomplete="off" />
-        </p>
-        <p>
-          <label for="usespecialchars">Use special chars</label>
-          <input id="usespecialchars" name="usespecialchars" type="checkbox" value="1" checked="checked" />
-        </p>
-        <p>
-          <label for="minspecialchars">Min. special chars</label>
-          <input id="minspecialchars" name="minspecialchars" type="number" min="1" value="2" autocomplete="off" />
-        </p>
-        <p>
-          <label for="autofill">Autofill password</label>
-          <input id="autofill" name="autofill" type="checkbox" value="1" checked="checked" />
-        </p>
+        <details>
+          <summary>Site settings</summary>
+          <p>
+            <label for="passwordlength">Password length</label>
+            <input id="passwordlength" name="passwordlength" type="number" min="4" max="256" value="" autocomplete="off" />
+          </p>
+          <p>
+            <label for="usenumbers">Use numbers</label>
+            <input id="usenumbers" name="usenumbers" type="checkbox" value="1" checked="checked" />
+          </p>
+          <p>
+            <label for="minnumbers">Min. numbers</label>
+            <input id="minnumbers" name="minnumbers" type="number" min="1" value="2" autocomplete="off" />
+          </p>
+          <p>
+            <label for="usespecialchars">Use special chars</label>
+            <input id="usespecialchars" name="usespecialchars" type="checkbox" value="1" checked="checked" />
+          </p>
+          <p>
+            <label for="minspecialchars">Min. special chars</label>
+            <input id="minspecialchars" name="minspecialchars" type="number" min="1" value="2" autocomplete="off" />
+          </p>
+          <p>
+            <label for="autofill">Autofill password</label>
+            <input id="autofill" name="autofill" type="checkbox" value="1" checked="checked" />
+          </p>
+        </details>
         <p style="text-align: center;">
           <input type="submit" value="Create" />
         </p>

@@ -51,3 +51,11 @@ input[type='submit']:hover,
 input[type='submit']:active {
   background-color: var(--color-yellow);
 }
+
+summary:focus {
+  outline: 0;
+}
+
+summary:hover {
+  cursor: default;
+}

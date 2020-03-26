@@ -22,7 +22,11 @@ Navigate to the login or register form of your desired page and click on the JSP
 
 The master password is the only one you have to remember and can be the same for each site. The domain name is extracted from the current URL. Ff you wish to use the third-level-domain (eg. www.site.com instead of just site.com) you have to add the desired domain on the options page or change it each time you create a password.
 
-Clicking on "Create" will now generate a new password:
+You can further customize the password for the current domain name via "Site settings". Eg. choose the minimum number of numbers or special chars.
+
+![Popup](/resources/screenshot_popup_settings.png)
+
+Clicking on "Create" will generate a new unique password for the current website:
 
 1. Create a key (domain name + master password)
 2. Use the defined salt and iteration number to initialize the PBKDF2 (SHA-256) function
