@@ -1,201 +1,159 @@
-// Focus Hack
-/*
-if(location.search !== "?foo") {
-    location.search = "?foo";
-    throw new Error;
-}
-*/
-$(function() {
-    if (!window.localStorage
-        || window.localStorage.salt == undefined
-        || window.localStorage.passwordlength == undefined
-        || window.localStorage.iterations == undefined
-        || window.localStorage.mydomains == undefined
-        || window.localStorage.specialchars == undefined) {
-        
-        chrome.tabs.create({ url: "options.html" }); 
-        window.close();
-    }
-    salt = window.localStorage.salt;
-    passwordlength = window.localStorage.passwordlength;
-    iterations = window.localStorage.iterations;
-    mydomains = [];
-    mydomainstext = window.localStorage.mydomains;
-    if (mydomainstext != "") {
-        mydomainstextpieces = mydomainstext.split(",");
-        for (i=0; i < mydomainstextpieces.length; i++) {
-            mydomains[i] = $.trim(mydomainstextpieces[i]);
-        }
-    }
-    
-    chrome.tabs.getSelected(null, function(tab) {
-        currenturl = tab.url.toLowerCase();
-        currenthostname = currenturl.match(/\/([^\/:]+)/)[1];
-        currenthostnamepieces = currenthostname.split(".");
-        currentdomainname = currenthostnamepieces[currenthostnamepieces.length - 2]
-            + "."
-            + currenthostnamepieces[currenthostnamepieces.length - 1];
-        
-        if (mydomains.length > 0
-            && currenthostnamepieces.length > 2
-            && $.inArray(currentdomainname, mydomains) != -1) {
-            
-            currentdomainname = currenthostnamepieces[currenthostnamepieces.length - 3]
-                + "."
-                + currentdomainname;
-        }
-        
-        $("#domainname").val(currentdomainname);
-        $("#masterpassword").focus();
-        
-        chrome.storage.sync.get(currentdomainname, function(items) {
-            if (items[$("#domainname").val()]) {
-                oldsitesettingsobj = JSON.parse(items[$("#domainname").val()]);
-                if (oldsitesettingsobj.specialchars != undefined) {
-                    $("#specialchars").attr("checked", oldsitesettingsobj.specialchars);
-                }
-                if (oldsitesettingsobj.autofill != undefined) {
-                    $("#autofill").attr("checked", oldsitesettingsobj.autofill);
-                }
-            }
-        });
-        
-        $("#f1 input").each(function() {
-            $(this).keydown(function(event) {
-                event.stopPropagation();
-                if (event.which == 13) {
-                    $("#f1").submit();
-                }
-            });            
-        });
-        
-        $("#f1").submit(function(event) {
-            event.preventDefault();
-            $("#domainname").val($.trim($("#domainname").val()));
-            sitepassword = createpassword($("#masterpassword").val(), 
-                $("#domainname").val(),
-                salt,
-                passwordlength,
-                iterations,
-                $("#specialchars").attr("checked"),
-                window.localStorage.specialchars);
-            if (sitepassword != "") {
-                // Store settings
-                newsettingsobj = {
-                    specialchars: $("#specialchars").attr("checked") ? true : false,
-                    autofill: $("#autofill").attr("checked") ? true : false
-                };
-                domainnamevalue = $("#domainname").val();
-                storagevalues = {};
-                storagevalues[$("#domainname").val()] = JSON.stringify(newsettingsobj);
-                chrome.storage.sync.set(storagevalues, function() {
-                    if ($("#autofill").attr("checked")) {
-                        autofillok = true;
-                        chrome.tabs.executeScript(null, { file: "content.js" });
-                        chrome.tabs.getSelected(null, function(tab) {
-                            chrome.tabs.sendRequest(tab.id, { password: sitepassword }, function(response) {
-                                if (response.autofill) {
-                                    window.close();
-                                } else {
-                                    noautofill();
-                                }
-                            });
-                        });
-                    } else {
-                        noautofill();
-                    }
-                });
-            } else {
-                window.close();
-            }
-            return false;
-        });
-    });
-});
+import { createPasswordForDomainname } from './modules/crypto.js'
+import { getValue, setValue } from './modules/form.js'
+import { VERSION, getVersion, getDomainnameFromURL, setExtensionIcon, getAllOptions, OPTIONS_FIELDS } from './modules/jspass.js'
 
-function noautofill() {
-    $("#f1 > p").each(function() {
-        $(this).hide();
-    });
-    $("#f1 > p:first input").val(sitepassword);
-    $("#f1 > p:first").show();
-    $("#f1 > p:first input").focus();
-    $("#f1 > p:first input").select();
-    $("#f1 > p:last input").val("Copy & Close");
-    $("#f1 > p:last input").click(function (event) {
-        event.preventDefault();
-        $("#f1 > p:first input").select();
-        jqueryevent = $.Event("keydown");
-        jqueryevent.which = 13;
-        $("#f1 > p:first input").trigger(jqueryevent);
-        return false;
-    });
-    $("#f1 > p:last").show();
-    $("#f1").unbind();
-    $("#f1").submit(function(event) {
-        event.preventDefault();
-        document.execCommand("copy", false, $("#f1 > p:first input").val());
-        window.close();
-        return false;
-    });
+let activetab
+document.addEventListener('DOMContentLoaded', event => {
+  if (getVersion() != VERSION) {
+    chrome.tabs.create({ url: 'options.html' })
+    window.close()
+    return
+  }
+
+  document.getElementById('usenumbers').addEventListener('input', event => {
+    setDependentFieldStyle(event.currentTarget.checked, 'minnumbers')
+  })
+
+  document.getElementById('usespecialchars').addEventListener('input', event => {
+    setDependentFieldStyle(event.currentTarget.checked, 'minspecialchars')
+  })
+
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    if (tabs.length < 1) {
+      window.close()
+      return
+    }
+
+    document.getElementById('passwordlength').value = window.localStorage.getItem(OPTIONS_FIELDS.PASSWORDLENGTH)
+
+    activetab = tabs[0]
+    const domainname = getDomainnameFromURL(activetab.url)
+    if (domainname !== '') {
+      setValue('domainname', domainname)
+      restoreSiteSettings(domainname)
+    }
+  })
+
+  document.getElementById('popupform1').addEventListener('submit', event => {
+    event.preventDefault()
+    const masterpassword = getValue('masterpassword')
+    const domainname = getValue('domainname')
+    if (masterpassword && domainname) {
+      document.querySelectorAll('#popupform1 input').forEach(element => {
+        element.disabled = true
+      })
+
+      // TODO show spinner
+
+      const passwordOptions = getAllOptions()
+
+      const siteSettings = {
+        usenumbers: document.getElementById('usenumbers').checked,
+        minnumbers: Number(document.getElementById('minnumbers').value),
+        usespecialchars: document.getElementById('usespecialchars').checked,
+        minspecialchars: Number(document.getElementById('minspecialchars').value),
+        autofill: document.getElementById('autofill').checked,
+      }
+
+      const passwordLength = document.getElementById('passwordlength').value
+      if (passwordLength != passwordOptions[OPTIONS_FIELDS.PASSWORDLENGTH]) {
+        siteSettings.passwordlength = Number(passwordLength)
+      }
+
+      storeSiteSettings(domainname, siteSettings)
+
+      createPasswordForDomainname(domainname, masterpassword, {
+        ...passwordOptions,
+        ...siteSettings,
+      }).then(sitepassword => {
+        if (siteSettings.autofill) {
+          chrome.tabs.executeScript(
+            {
+              file: 'autofill.js',
+            },
+            results => {
+              if (results && results.length === 1) {
+                chrome.tabs.sendMessage(activetab.id, sitepassword, response => {
+                  if (response) {
+                    window.close()
+                  } else {
+                    showPopupForm2(sitepassword)
+                  }
+                })
+              } else {
+                showPopupForm2(sitepassword)
+              }
+            }
+          )
+        } else {
+          showPopupForm2(sitepassword)
+        }
+      })
+    }
+  })
+
+  document.getElementById('popupform2').addEventListener('submit', event => {
+    event.preventDefault()
+    document.getElementById('sitepassword').focus()
+    document.getElementById('sitepassword').select()
+    navigator.clipboard.writeText(getValue('sitepassword')).then(() => {
+      setValue('sitepassword', '')
+      window.close()
+    })
+  })
+})
+
+const restoreSiteSettings = domainname => {
+  chrome.storage.sync.get([domainname], item => {
+    const siteSettings = item[domainname]
+    if (siteSettings) {
+      if (siteSettings.passwordlength !== undefined) {
+        document.getElementById('passwordlength').value = siteSettings.passwordlength
+      }
+      if (siteSettings.usenumbers !== undefined) {
+        document.getElementById('usenumbers').checked = siteSettings.usenumbers
+        setDependentFieldStyle(siteSettings.usenumbers, 'minnumbers')
+      }
+      if (siteSettings.minnumbers !== undefined) {
+        document.getElementById('minnumbers').value = siteSettings.minnumbers
+      }
+      if (siteSettings.usespecialchars !== undefined) {
+        document.getElementById('usespecialchars').checked = siteSettings.usespecialchars
+        setDependentFieldStyle(siteSettings.usespecialchars, 'minspecialchars')
+      }
+      if (siteSettings.minspecialchars !== undefined) {
+        document.getElementById('minspecialchars').value = siteSettings.minspecialchars
+      }
+      if (siteSettings.autofill !== undefined) {
+        document.getElementById('autofill').checked = siteSettings.autofill
+      }
+    }
+  })
 }
 
-function createpassword(masterpassword, domainname, salt, passwordlength, iterations, usespecialchars, specialchars) {
-    passwordobj = CryptoJS.PBKDF2(masterpassword + domainname, salt, {
-        keySize: passwordlength,
-        iterations: iterations });
-    passwordwordsarray = passwordobj.words;
-    
-    chars1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    chars2 = "abcdefghijklmnopqrstuvwxyz";
-    chars3 = "0123456789";
-    chars4 = specialchars;
-    chars = chars1 + chars2 + chars3;
-    if (usespecialchars) {
-        chars += chars4;
-    }
-    chars1count = 0;
-    chars2count = 0;
-    chars3count = 0;
-    chars4count = 0;
-    
-    password = "";
-    charscheckindex = Math.floor(passwordlength / 3);
-    
-    for (i=0; i < passwordlength; i++) {
-        charstemp = chars;
-        if (i >= charscheckindex) {
-            if (usespecialchars && chars4count <= 2) {
-                charstemp = chars4;
-            } else if (chars1count <= 1) {
-                charstemp = chars1;
-            } else if (chars2count <= 1) {
-                charstemp = chars2;
-            } else if (chars3count <= 1) {
-                charstemp = chars3;
-            }
-        }
-        do {
-            charsindextemp = Math.abs(passwordwordsarray[i]) % charstemp.length;
-            if (passwordwordsarray[i] < 0) {
-                charsindextemp = charstemp.length - 1 - charsindextemp;
-            }
-            passwordwordsarray[i] += passwordwordsarray[i] + 1;
-            passwordchar = charstemp[charsindextemp];
-        } while (password.indexOf(passwordchar) > -1);
-        
-        if (chars1.indexOf(passwordchar) >- 1) {
-            chars1count++;
-        } else if(chars2.indexOf(passwordchar) >- 1){
-            chars2count++;
-        } else if(chars3.indexOf(passwordchar) >- 1){
-            chars3count++;
-        } else if(usespecialchars && chars4.indexOf(passwordchar) >- 1){
-            chars4count++;
-        }
-        
-        password += passwordchar;
-    }
-    
-    return password;
+const storeSiteSettings = (domainname, settings) => {
+  const domainoptions = {}
+  domainoptions[domainname] = settings
+  chrome.storage.sync.set(domainoptions, () => {
+    setExtensionIcon(domainname)
+  })
+}
+
+const showPopupForm2 = password => {
+  setValue('sitepassword', password)
+  document.getElementById('popupform1').style.display = 'none'
+  document.getElementById('popupform2').style.display = 'inline'
+  document.getElementById('sitepassword').focus()
+  document.getElementById('sitepassword').select()
+}
+
+const setDependentFieldStyle = (status, dependentFieldname) => {
+  const dependentField = document.getElementById(dependentFieldname)
+  if (status) {
+    dependentField.readOnly = false
+    dependentField.parentElement.style.opacity = 'initial'
+  } else {
+    dependentField.readOnly = true
+    dependentField.parentElement.style.opacity = 0.4
+  }
 }

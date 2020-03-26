@@ -1,77 +1,62 @@
-$(function() {
-    restore_options();
-    $("#f1").submit(function(event) {
-        event.preventDefault();
-        save_options();
-        return false;
-    });
-});
+import { getRandomHash, getRandomNumber } from './modules/crypto.js'
+import { getValue, setValue, setValuesFromLocalStorage, setTextContent, isNullOrWhitespace, isInteger } from './modules/form.js'
+import { VERSION, OPTIONS_FIELDS, getVersion } from './modules/jspass.js'
 
-function save_options() {
-    if (!window.localStorage) {
-        $("#info").html("Sorry can't store settings if LocalStorage is not accessible...");
-        $("#f1").hide();
-        return false;
-    }
-    
-    $("#salt").val($.trim($("#salt").val()));
-    $("#passwordlength").val($.trim($("#passwordlength").val()));
-    $("#iterations").val($.trim($("#iterations").val()));
-    $("#mydomains").val($.trim($("#mydomains").val()));
-    $("#specialchars").val($.trim($("#specialchars").val()));
-    
-    if ($("#salt").val() == "") {
-        $("#status").html("Salt can't be empty");
-        return false;
-    }
-    if ($("#passwordlength").val() == "" || !$.isNumeric($("#passwordlength").val()) || $("#passwordlength").val() < 8) {
-        $("#status").html("Password length can't be empty, must be a number and bigger or equal 8");
-        return false;
-    }
-    if ($("#iterations").val() == "" || !$.isNumeric($("#iterations").val()) || $("#iterations").val() <= 0) {
-        $("#status").html("Iterations can't be empty and must be a number");
-        return false;
-    }
-    if ($("#specialchars").val() == "") {
-        $("#status").html("Special chars can't be empty");
-        return false;
-    }
-    
-    if (window.localStorage.firstrun == undefined) {
-        window.localStorage.firstrun = true;
-    }
-    
-    window.localStorage.salt = $("#salt").val();
-    window.localStorage.passwordlength = $("#passwordlength").val();
-    window.localStorage.iterations = $("#iterations").val();
-    window.localStorage.mydomains = $("#mydomains").val();
-    window.localStorage.specialchars = $("#specialchars").val();
-    
-    $("#status").html("Settings successfully saved");
-    
-    return true;
+const INFO_FIELD = 'info'
+const STATUS_FIELD = 'status'
+
+document.addEventListener('DOMContentLoaded', event => {
+  restoreOptions()
+  document.getElementById('optionsform').addEventListener('submit', event => {
+    event.preventDefault()
+    storeOptions()
+  })
+})
+
+const restoreOptions = () => {
+  if (getVersion() === 0) {
+    setTextContent(
+      INFO_FIELD,
+      'Please test your settings before using them for real sites. If you change them later, your generated passwords will also change!'
+    )
+    setValue(OPTIONS_FIELDS.SALT, getRandomHash(256))
+    setValue(OPTIONS_FIELDS.ITERATIONS, getRandomNumber(1000, 10000))
+    setTextContent(STATUS_FIELD, 'Created initial random values for salt and iterations.')
+  } else {
+    setValuesFromLocalStorage(OPTIONS_FIELDS)
+  }
 }
 
-function restore_options() {
-    if (!window.localStorage) {
-        $("#info").html("Sorry can't store settings if LocalStorage is not accessible...");
-        $("#f1").hide();
-        return false;
-    }
-    
-    if (window.localStorage.firstrun == undefined) {
-        $("#info").html("Please test your settings bevore using the generated passwords for real sites. If you change them later, your generated passwords will also change!");
-        newsalt = CryptoJS.lib.WordArray.random(512/8);
-        $("#salt").val(newsalt);
-        newiterations = Math.floor(Math.random() * (700 - 500 + 1)) + 500;
-        $("#iterations").val(newiterations);
-    } else {
-        $("#salt").val(window.localStorage.salt);
-        $("#passwordlength").val(window.localStorage.passwordlength);
-        $("#iterations").val(window.localStorage.iterations);
-        $("#mydomains").val(window.localStorage.mydomains);
-        $("#specialchars").val(window.localStorage.specialchars);
-    }
-    
-    return true;
+const storeOptions = () => {
+  const salt = getValue(OPTIONS_FIELDS.SALT)
+  const passwordlength = getValue(OPTIONS_FIELDS.PASSWORDLENGTH)
+  const iterations = getValue(OPTIONS_FIELDS.ITERATIONS)
+  const mydomains = getValue(OPTIONS_FIELDS.MYDOMAINS)
+  const specialchars = getValue(OPTIONS_FIELDS.SPECIALCHARS)
+
+  if (isNullOrWhitespace(salt)) {
+    setTextContent(STATUS_FIELD, "Salt can't be empty.")
+    return
+  }
+  if (!isInteger(passwordlength) || passwordlength < 4) {
+    setTextContent(STATUS_FIELD, "Password length can't be empty, must be a number and bigger than 4.")
+    return
+  }
+  if (!isInteger(iterations) || iterations <= 0) {
+    setTextContent(STATUS_FIELD, "Iterations can't be empty and must be a number.")
+    return
+  }
+  if (isNullOrWhitespace(specialchars)) {
+    setTextContent(STATUS_FIELD, "Special chars can't be empty.")
+    return
+  }
+
+  window.localStorage.setItem(OPTIONS_FIELDS.VERSION, VERSION)
+  window.localStorage.setItem(OPTIONS_FIELDS.SALT, salt)
+  window.localStorage.setItem(OPTIONS_FIELDS.PASSWORDLENGTH, parseInt(passwordlength))
+  window.localStorage.setItem(OPTIONS_FIELDS.ITERATIONS, iterations)
+  window.localStorage.setItem(OPTIONS_FIELDS.MYDOMAINS, mydomains.toLowerCase())
+  window.localStorage.setItem(OPTIONS_FIELDS.SPECIALCHARS, specialchars)
+
+  setTextContent(STATUS_FIELD, 'Settings successfully saved.')
 }

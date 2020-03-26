@@ -1,48 +1,110 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>JSPass - Settings</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
-        <script type="text/javascript" src="pbkdf2.js"></script>
-        <script type="text/javascript" src="options.js"></script>
-    </head>
-    <body>
-        <h1>JSPass - Options</h1>
-        <p id="info">
-            Changing any of this settings will also change your generated passwords!
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSPass - Options</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <style>
+      main {
+        width: 600px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 1.8em;
+        letter-spacing: 0.1em;
+        text-align: center;
+      }
+
+      label {
+        float: none;
+        display: block;
+        letter-spacing: 0.1em;
+      }
+
+      span {
+        display: block;
+        color: var(--color-dark-gray);
+        margin-bottom: 0.2em;
+      }
+
+      input {
+        font-size: 100%;
+      }
+
+      #info {
+        text-align: center;
+        letter-spacing: 0.1em;
+        border: 1px solid var(--color-yellow);
+        padding: 7px;
+        width: calc(100% - 14px);
+        border-radius: 4px;
+      }
+
+      #status {
+        text-align: center;
+      }
+    </style>
+
+    <script type="module" src="options.js" defer></script>
+  </head>
+
+  <body>
+    <main>
+      <h1>JSPass - Options</h1>
+      <p id="info">
+        Changing any of these settings will also change all your previously generated passwords!
+      </p>
+      <form id="optionsform">
+        <p>
+          <label for="salt">Salt</label>
+          <span>Random hex hash which will be used together with your master password.</span>
+          <!-- <input type="text" name="salt" id="salt" value="" autocomplete="off" required /> -->
+          <textarea name="salt" id="salt" rows="4" value="" autocomplete="off" required></textarea>
         </p>
-        <form id="f1" class="options">
-            <p>
-                <label for="salt">Salt:</label>
-                <span>Random text which will be appended to your master password</span>
-                <input type="text" name="salt" id="salt" value="">
-            </p>
-            <p>
-                <label for="passwordlength">Password length:</label>
-                <span>Length of the generated password</span>
-                <input type="text" name="passwordlength" id="passwordlength" value="15">
-            </p>
-            <p>
-                <label for="iterations">Iterations:</label>
-                <span>How many time the password will be randomized, higher value means slower processing</span>
-                <input type="text" name="iterations" id="iterations" value="">
-            </p>
-            <p>
-                <label for="mydomains">My domains:</label>
-                <span>Comma separated list with domains which will be used as third-level-domains (e.g. server1.mydomain.com instead of just mydomain.com)</span>
-                <input type="text" name="mydomains" id="mydomains" value="">
-            </p>
-            <p>
-                <label for="specialchars">Special Chars:</label>
-                <span>Used special chars</span>
-                <input type="text" name="specialchars" id="specialchars" value="!#$%&()*+,-./:;<=>?@[]^_`{|}~">
-            </p>
-            <p style="text-align: center">
-                <span id="status">&nbsp;</span>
-                <input type="submit" value="Save settings">
-            </p>
-        </form>
-    </body>
+        <p>
+          <label for="iterations">Iterations</label>
+          <span
+            >How many times the password will be randomized, a higher value means more CPU power is needed and thus will make brute-force
+            attacks harder.</span
+          >
+          <input type="number" name="iterations" id="iterations" min="1" max="99999" value="" autocomplete="off" required />
+        </p>
+        <p>
+          <label for="passwordlength">Password length</label>
+          <span>The default length of the generated password.</span>
+          <input type="number" name="passwordlength" id="passwordlength" min="4" max="256" value="15" autocomplete="off" required />
+        </p>
+        <p>
+          <label for="mydomains">My domains</label>
+          <span
+            >Comma-separated list with domains that will be used as third-level-domains (e.g. server1.mydomain.com instead of just
+            mydomain.com).</span
+          >
+          <input type="text" name="mydomains" id="mydomains" value="" autocomplete="off" />
+        </p>
+        <p>
+          <label for="specialchars">Special Chars</label>
+          <span>The allowed special chars.</span>
+          <!--
+            Special chars from some non qualitative tests on different generators:
+            - Google Chrome .-@!?_
+            - Lastpass      *#%&^@!$
+            - 1password     ^@?#)~_!]=->*.}+,:%
+            - SaveInCloude  <$@{*>:.-\_%&!=+)/]?#^
+            - DashLane      [!$>@"<:%;(#)}/&_{\,|?
+            - Old jspass    !#$%&()*+,-./:;<=>?@[]^_`{|}~ (did fail on some sites)
+          -->
+          <input type="text" name="specialchars" id="specialchars" value="@!?_#%.-*&$^:" autocomplete="off" required />
+        </p>
+        <p>
+          <span id="status">&nbsp;</span>
+          <input type="submit" value="Save settings" />
+        </p>
+      </form>
+    </main>
+  </body>
 </html>

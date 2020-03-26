@@ -1,38 +1,97 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>JSPass</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
-        <script type="text/javascript" src="pbkdf2.js"></script>
-        <script type="text/javascript" src="popup.js"></script>
-    </head>
-    <body>
-        <form id="f1">
-            <p style="display:none">
-                <label for="sitepassword">Site password:</label>
-                <input id="sitepassword" name="sitepassword" type="text" autocomplete="off">
-            </p>
-            <p>
-                <label for="masterpassword">Master password:</label>
-                <input id="masterpassword" name="masterpassword" type="password" autocomplete="off">
-            </p>
-            <p>
-                <label for="domainname">Domain Name:</label>
-                <input id="domainname" name="domainname" type="text" value="">
-            </p>
-            <p>
-                <label for="specialchars">With special chars:</label>
-                <input id="specialchars" name="specialchars" type="checkbox" value="1" checked="checked">
-            </p>
-            <p>
-                <label for="autofill">Autofill password:</label>
-                <input id="autofill" name="autofill" type="checkbox" value="1" checked="checked">
-            </p>
-            <p style="text-align:center">
-                <input type="submit" value="Generate">
-            </p>
-        </form>
-    </body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSPass</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <style>
+      main {
+        width: 200px;
+      }
+
+      input[type='number'],
+      input[type='checkbox'] {
+        width: 40px;
+      }
+
+      input[type='number'] {
+        margin-top: -3px;
+        text-align: right;
+      }
+
+      #popupform2 input[type='text'] {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 100%;
+      }
+
+      label {
+        float: left;
+        width: 150px;
+        font-size: 13.3333px;
+        color: var(--color-dark-gray);
+      }
+
+      label strong {
+        color: var(--color-black);
+        font-weight: 400;
+      }
+    </style>
+
+    <script type="module" src="popup.js" defer></script>
+  </head>
+
+  <body>
+    <main>
+      <form id="popupform1">
+        <p>
+          <label for="masterpassword"><strong>Master password</strong></label>
+          <input id="masterpassword" name="masterpassword" type="password" autocomplete="off" required autofocus />
+        </p>
+        <p>
+          <label for="domainname"><strong>Domain name</strong></label>
+          <input id="domainname" name="domainname" type="text" value="" required />
+        </p>
+        <p>
+          <label for="passwordlength">Password length</label>
+          <input id="passwordlength" name="passwordlength" type="number" min="4" max="256" value="" autocomplete="off" />
+        </p>
+        <p>
+          <label for="usenumbers">Use numbers</label>
+          <input id="usenumbers" name="usenumbers" type="checkbox" value="1" checked="checked" />
+        </p>
+        <p>
+          <label for="minnumbers">Min. numbers</label>
+          <input id="minnumbers" name="minnumbers" type="number" min="1" value="2" autocomplete="off" />
+        </p>
+        <p>
+          <label for="usespecialchars">Use special chars</label>
+          <input id="usespecialchars" name="usespecialchars" type="checkbox" value="1" checked="checked" />
+        </p>
+        <p>
+          <label for="minspecialchars">Min. special chars</label>
+          <input id="minspecialchars" name="minspecialchars" type="number" min="1" value="2" autocomplete="off" />
+        </p>
+        <p>
+          <label for="autofill">Autofill password</label>
+          <input id="autofill" name="autofill" type="checkbox" value="1" checked="checked" />
+        </p>
+        <p style="text-align: center;">
+          <input type="submit" value="Create" />
+        </p>
+      </form>
+
+      <form id="popupform2" style="display: none;">
+        <p>
+          <label for="sitepassword"><strong>Site password</strong></label>
+          <input id="sitepassword" name="sitepassword" type="text" autocomplete="off" />
+        </p>
+        <p style="text-align: center;">
+          <input type="submit" value="Copy & Close" />
+        </p>
+      </form>
+    </main>
+  </body>
 </html>

@@ -1,61 +1,53 @@
-* {
-    font-family: Cantarell, Arial, sans-serif;
-    font-size: 14px;
+:root {
+  --color-white: #fff;
+  --color-black: #000;
+  --color-light-gray: #f1f3f4;
+  --color-gray: #e9ebec;
+  --color-dark-gray: #5f6368;
+  --color-yellow: #fcc23b;
 }
 
-h1 {
-    font-size: 2em;
-    letter-spacing: 0.1em;
-    text-align: center;
-    width: 600px;
-}
-
+body,
 input {
-    border: 1px solid #999;
-    padding: 2px;
-}
-input[type=text], input[type=password], input[type=submit] {
-    width: 200px;
-    -webkit-border-radius: 3px;
-}
-input[type=text], input[type=password] {
-    background-color: #eee;
-}
-input[type=submit] {
-    background-color: #ccc;
-    border-width: 2px;
-}
-#domainname {
-    background-color: transparent;
+  font-family: Roboto, Cantarell, Arial, sans-serif;
+  font-size: 87.5%;
+  color: var(--color-black);
 }
 
-label {
-    float: left;
-    width: 150px;
-    font-weight: bold;
+body {
+  background-color: var(--color-white);
 }
 
-#info {
-    font-size: 1.4em;
-    letter-spacing: 0.1em;
-    border: 1px solid #999;
-    padding: 5px;
-    width: 596px;
-    -webkit-border-radius: 7px;
+input,
+textarea {
+  background-color: var(--color-light-gray);
+  border: 1px solid var(--color-light-gray);
+  border-radius: 4px;
+  padding: 4px;
+  width: calc(100% - 10px);
 }
-.options p {
-    width: 606px;
+
+input:hover,
+textarea:hover {
+  background-color: var(--color-gray);
 }
-.options label {
-    float: none;
-    width: 600px;
-    display: block;
-    font-size: 1.1em;
+
+input:focus,
+textarea:focus {
+  outline: 0;
+  border-color: var(--color-yellow);
+  background-color: var(--color-gray);
 }
-.options input[type=text], .options input[type=submit] {
-    width: 600px;
+
+input[type='submit'] {
+  background-color: var(--color-gray);
+  border: 2px solid var(--color-yellow);
+  font-weight: 500;
+  line-height: 1.6em;
+  width: 100%;
 }
-.options span {
-    display: block;
-    font-style: italic;
+
+input[type='submit']:hover,
+input[type='submit']:active {
+  background-color: var(--color-yellow);
 }
