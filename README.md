@@ -1,6 +1,6 @@
 # JSPass
 
-A chrome extension to generate random passwords using PBKDF2 with a master password and the domain name. Like this, each site has a unique password but you only have to remember one.
+A chrome extension to generate random passwords using PBKDF2 with a master password and a domain name. Like this, each site has a unique password but you only have to remember one.
 
 [Get it from Chrome Web Store](https://chrome.google.com/webstore/detail/jspass/hbofdeafjgfikkakjdgmlfojabijcdan)
 
@@ -52,6 +52,10 @@ Each time you create a password, the current settings are stored and automatical
   - Use numbers and minimum count of numbers the password should have
   - Use special chars and minimum count of them
   - Autofill password
+
+## Drawback
+
+Extensions only work on desktop chrome versions. If you need access to generated passwords from a mobile device you can't do this with this extension. I've created a simple page which generates the same passwords for non-extension-usages: https://jspass.humbapa.ch [(Source code)](https://github.com/humbapa/jspass-website)
 
 ## Thanks
 
