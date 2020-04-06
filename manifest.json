@@ -2,7 +2,7 @@
   "name": "JSPass",
   "version": "2.0",
   "manifest_version": 2,
-  "description": "Generate random passwords using PBKDF2 with a master password and the domain name. Like this each site has a unique password but you only have to remember one.",
+  "description": "Generate random passwords using PBKDF2 with a master password and a domain name.",
   "author": "tinu@humbapa.ch",
   "homepage_url": "https://github.com/humbapa/jspass",
   "icons": {
