@@ -5,9 +5,9 @@ import { VERSION, OPTIONS_FIELDS, getVersion } from './modules/jspass.js'
 const INFO_FIELD = 'info'
 const STATUS_FIELD = 'status'
 
-document.addEventListener('DOMContentLoaded', event => {
+document.addEventListener('DOMContentLoaded', (event) => {
   restoreOptions()
-  document.getElementById('optionsform').addEventListener('submit', event => {
+  document.getElementById('optionsform').addEventListener('submit', (event) => {
     event.preventDefault()
     storeOptions()
   })
@@ -21,18 +21,18 @@ const restoreOptions = () => {
     )
     setValue(OPTIONS_FIELDS.SALT, getRandomHash(256))
     setValue(OPTIONS_FIELDS.ITERATIONS, getRandomNumber(1000, 10000))
-    setTextContent(STATUS_FIELD, 'Created initial random values for salt and iterations.')
+    setTextContent(STATUS_FIELD, 'Using initial random values for salt and iterations. Please refresh the page to generate new ones.')
   } else {
     setValuesFromLocalStorage(OPTIONS_FIELDS)
   }
 }
 
 const storeOptions = () => {
-  const salt = getValue(OPTIONS_FIELDS.SALT)
+  let salt = getValue(OPTIONS_FIELDS.SALT)
   const passwordlength = getValue(OPTIONS_FIELDS.PASSWORDLENGTH)
   const iterations = getValue(OPTIONS_FIELDS.ITERATIONS)
   const mydomains = getValue(OPTIONS_FIELDS.MYDOMAINS)
-  const specialchars = getValue(OPTIONS_FIELDS.SPECIALCHARS)
+  let specialchars = getValue(OPTIONS_FIELDS.SPECIALCHARS)
 
   if (isNullOrWhitespace(salt)) {
     setTextContent(STATUS_FIELD, "Salt can't be empty.")
@@ -51,6 +51,11 @@ const storeOptions = () => {
     return
   }
 
+  const originalSaltLength = salt.length
+  const originalSpecialCharsLength = specialchars.length
+  salt = salt.toLowerCase().replace(/[^a-f0-9]/g, '')
+  specialchars = specialchars.replace(/[\s\n\ra-zA-Z0-9]/g, '')
+
   window.localStorage.setItem(OPTIONS_FIELDS.VERSION, VERSION)
   window.localStorage.setItem(OPTIONS_FIELDS.SALT, salt)
   window.localStorage.setItem(OPTIONS_FIELDS.PASSWORDLENGTH, parseInt(passwordlength))
@@ -58,5 +63,11 @@ const storeOptions = () => {
   window.localStorage.setItem(OPTIONS_FIELDS.MYDOMAINS, mydomains.toLowerCase())
   window.localStorage.setItem(OPTIONS_FIELDS.SPECIALCHARS, specialchars)
 
-  setTextContent(STATUS_FIELD, 'Settings successfully saved.')
+  if (salt.length !== originalSaltLength || specialchars.length !== originalSpecialCharsLength) {
+    setValue(OPTIONS_FIELDS.SALT, salt)
+    setValue(OPTIONS_FIELDS.SPECIALCHARS, specialchars)
+    setTextContent(STATUS_FIELD, 'One or more not allowed characters have been removed. Please recheck and save again.')
+  } else {
+    setTextContent(STATUS_FIELD, 'Settings successfully saved.')
+  }
 }
