@@ -65,7 +65,7 @@
         </p>
         <p>
           <label for="masterpassword"><strong>Master password</strong></label>
-          <input id="masterpassword" name="masterpassword" type="password" autocomplete="off" required autofocus />
+          <input id="masterpassword" name="masterpassword" type="password" autocomplete="new-password" required autofocus />
         </p>
         <details>
           <summary>Site settings</summary>
@@ -91,20 +91,20 @@
           </p>
           <p>
             <label for="autofill">Autofill password</label>
-            <input id="autofill" name="autofill" type="checkbox" value="1" checked="checked" />
+            <input id="autofill" name="autofill" type="checkbox" value="1" />
           </p>
         </details>
-        <p style="text-align: center;">
+        <p style="text-align: center">
           <input type="submit" value="Generate" />
         </p>
       </form>
 
-      <form id="popupform2" style="display: none;">
+      <form id="popupform2" style="display: none">
         <p>
           <label for="sitepassword"><strong>Site password</strong></label>
           <input id="sitepassword" name="sitepassword" type="text" autocomplete="off" />
         </p>
-        <p style="text-align: center;">
+        <p style="text-align: center">
           <input type="submit" value="Copy & Close" />
         </p>
       </form>

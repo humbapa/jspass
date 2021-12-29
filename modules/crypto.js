@@ -51,7 +51,7 @@ function createPasswordForDomainname(domain, password, settings) {
         false,
         ['deriveBits', 'deriveKey']
       )
-      .then(key => {
+      .then((key) => {
         window.crypto.subtle
           .deriveBits(
             {
@@ -63,7 +63,7 @@ function createPasswordForDomainname(domain, password, settings) {
             key,
             passwordlength * 8
           )
-          .then(key => {
+          .then((key) => {
             const letterchars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
             let chars = letterchars
 
@@ -126,7 +126,7 @@ function createPasswordForDomainname(domain, password, settings) {
                 const newpasswordcharposition = lettercharspositions[key % lettercharspositions.length]
                 numbercharspositions.push(newpasswordcharposition)
                 sitepassword = replaceCharAtPosition(sitepassword, newpasswordchar, newpasswordcharposition)
-                lettercharspositions = lettercharspositions.filter(value => value !== newpasswordcharposition)
+                lettercharspositions = lettercharspositions.filter((value) => value !== newpasswordcharposition)
               }
             }
 
@@ -137,7 +137,7 @@ function createPasswordForDomainname(domain, password, settings) {
                 const newpasswordcharposition = lettercharspositions[key % lettercharspositions.length]
                 specialcharspositions.push(newpasswordcharposition)
                 sitepassword = replaceCharAtPosition(sitepassword, newpasswordchar, newpasswordcharposition)
-                lettercharspositions = lettercharspositions.filter(value => value !== newpasswordcharposition)
+                lettercharspositions = lettercharspositions.filter((value) => value !== newpasswordcharposition)
               }
             }
 

@@ -1,4 +1,4 @@
-const VERSION = 2.0
+const VERSION = 2.1
 
 const OPTIONS_FIELDS = {
   VERSION: 'version',
@@ -9,15 +9,25 @@ const OPTIONS_FIELDS = {
   PASSWORDLENGTH: 'passwordlength',
 }
 
-function getVersion() {
-  const version = window.localStorage.getItem(OPTIONS_FIELDS.VERSION)
-  if (!version) {
-    return 0
+async function getVersion() {
+  const item = await chrome.storage.local.get([OPTIONS_FIELDS.VERSION])
+  if (item[OPTIONS_FIELDS.VERSION]) {
+    return parseFloat(item[OPTIONS_FIELDS.VERSION])
+  } else {
+    try {
+      // try old storage (version < 2.1)
+      const version = window.localStorage.getItem(OPTIONS_FIELDS.VERSION)
+      if (!version) {
+        return 0
+      }
+      return parseFloat(version)
+    } catch {
+      return 0
+    }
   }
-  return version
 }
 
-function getDomainnameFromURL(url) {
+async function getDomainnameFromURL(url) {
   if (!url) {
     return ''
   }
@@ -30,9 +40,9 @@ function getDomainnameFromURL(url) {
   if (hostnamepieceslength > 1) {
     domainname = `${hostnamepieces[hostnamepieceslength - 2]}.${hostnamepieces[hostnamepieceslength - 1]}`
     if (hostnamepieceslength > 2) {
-      const mydomains = window.localStorage.getItem(OPTIONS_FIELDS.MYDOMAINS)
-      if (mydomains) {
-        const mydomainspieces = mydomains.split(',')
+      const item = await chrome.storage.local.get([OPTIONS_FIELDS.MYDOMAINS])
+      if (item[OPTIONS_FIELDS.MYDOMAINS]) {
+        const mydomainspieces = item[OPTIONS_FIELDS.MYDOMAINS].split(',')
         for (let i = 0, ii = mydomainspieces.length; i < ii; i++) {
           if (mydomainspieces[i].trim() === domainname) {
             domainname = `${hostnamepieces[hostnamepieceslength - 3]}.${domainname}`
@@ -50,25 +60,25 @@ function getDomainnameFromURL(url) {
 
 function setExtensionIcon(domainname) {
   if (domainname !== '') {
-    chrome.storage.sync.get([domainname], item => {
+    chrome.storage.sync.get([domainname], (item) => {
       if (item[domainname]) {
-        chrome.browserAction.setIcon({ path: 'resources/icon_active19.png' })
+        chrome.action.setIcon({ path: 'resources/icon_active19.png' })
       } else {
-        chrome.browserAction.setIcon({ path: 'resources/icon19.png' })
+        chrome.action.setIcon({ path: 'resources/icon19.png' })
       }
     })
   } else {
-    chrome.browserAction.setIcon({ path: 'resources/icon19.png' })
+    chrome.action.setIcon({ path: 'resources/icon19.png' })
   }
 }
 
-function getAllOptions() {
-  const storageData = {}
+async function getAllOptions() {
+  const keys = []
   for (const constFieldName in OPTIONS_FIELDS) {
-    const fieldName = OPTIONS_FIELDS[constFieldName]
-    storageData[fieldName] = window.localStorage.getItem(fieldName)
+    keys.push(OPTIONS_FIELDS[constFieldName])
   }
-  return storageData
+  const items = await chrome.storage.local.get(keys)
+  return items
 }
 
 export { VERSION, OPTIONS_FIELDS, getVersion, getDomainnameFromURL, setExtensionIcon, getAllOptions }

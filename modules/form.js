@@ -14,12 +14,13 @@ function setValue(fieldId, value) {
 }
 
 function setValueFromLocalStorage(fieldId) {
-  let value = ''
-  const valueFromLocalStorage = window.localStorage.getItem(fieldId)
-  if (valueFromLocalStorage) {
-    value = valueFromLocalStorage
-  }
-  setValue(fieldId, value)
+  chrome.storage.local.get([fieldId], (items) => {
+    let value = ''
+    if (items[fieldId]) {
+      value = items[fieldId]
+    }
+    setValue(fieldId, value)
+  })
 }
 
 function setValuesFromLocalStorage(fieldObject) {

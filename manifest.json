@@ -1,7 +1,7 @@
 {
   "name": "JSPass",
-  "version": "2.0",
-  "manifest_version": 2,
+  "version": "2.1",
+  "manifest_version": 3,
   "description": "Generate random passwords using PBKDF2 with a master password and a domain name.",
   "author": "tinu@humbapa.ch",
   "homepage_url": "https://github.com/humbapa/jspass",
@@ -12,13 +12,14 @@
   },
   "options_page": "options.html",
   "background": {
-    "page": "background.html",
-    "persistent": false
+    "service_worker": "background.js",
+    "type": "module"
   },
-  "browser_action": {
+  "action": {
     "default_icon": "resources/icon19.png",
     "default_title": "JSPass",
     "default_popup": "popup.html"
   },
-  "permissions": ["activeTab", "clipboardWrite", "storage", "http://*/*", "https://*/*"]
+  "permissions": ["activeTab", "clipboardWrite", "storage", "scripting"],
+  "host_permissions": ["http://*/", "https://*/"]
 }
