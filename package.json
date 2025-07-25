@@ -2,6 +2,6 @@
   "name": "jspass",
   "private": true,
   "devDependencies": {
-    "prettier": "*"
+    "prettier": "^3"
   }
 }
