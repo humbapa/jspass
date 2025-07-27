@@ -55,7 +55,7 @@ Each time you create a password, the current settings are stored and automatical
 
 ## Drawback
 
-Extensions only work on desktop chrome versions. If you need access to generated passwords from a mobile device you can't do this with this extension. I've created a simple page which generates the same passwords for non-extension-usages: https://jspass.humbapa.ch:44350 [(Source code)](https://github.com/humbapa/jspass-website)
+Extensions only work on desktop chrome versions. If you need access to generated passwords from a mobile device you can't do this with this extension. I've created a simple page which generates the same passwords for non-extension-usages: https://jspass.humbapa.ch [(Source code)](https://github.com/humbapa/jspass-website)
 
 ## Thanks
 
